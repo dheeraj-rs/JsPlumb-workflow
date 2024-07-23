@@ -8,6 +8,7 @@ import DraggableNode from './DraggableNode';
 const DraggableWorkflow = () => {
   const containerRef = useRef(null);
   const jsPlumbInstanceRef = useRef(null);
+  const draggableNodesRef = useRef(new Set());
   const [nodes, setNodes] = useState([
     { id: 'node1', top: 50, left: 50, text: 'Node 1' },
   ]);
@@ -32,34 +33,33 @@ const DraggableWorkflow = () => {
     });
     jsPlumbInstanceRef.current.setContainer(containerRef.current);
 
-    nodes.forEach((node) => {
-      makeNodeDraggable(node.id);
-    });
-
     jsPlumbInstanceRef.current.bind('beforeDetach', () => false);
   };
 
   const makeNodeDraggable = (nodeId) => {
-    jsPlumbInstanceRef.current.draggable(nodeId, {
-      containment: containerRef.current,
-      drag: () => {
-        jsPlumbInstanceRef.current.repaintEverything();
-      },
-      stop: (event) => {
-        const nodeElement = event.el;
-        setNodes((prevNodes) =>
-          prevNodes.map((node) =>
-            node.id === nodeId
-              ? {
-                  ...node,
-                  top: parseInt(nodeElement.style.top, 10),
-                  left: parseInt(nodeElement.style.left, 10),
-                }
-              : node
-          )
-        );
-      },
-    });
+    if (!draggableNodesRef.current.has(nodeId)) {
+      jsPlumbInstanceRef.current.draggable(nodeId, {
+        containment: containerRef.current,
+        drag: () => {
+          jsPlumbInstanceRef.current.repaintEverything();
+        },
+        stop: (event) => {
+          const nodeElement = event.el;
+          setNodes((prevNodes) =>
+            prevNodes.map((node) =>
+              node.id === nodeId
+                ? {
+                    ...node,
+                    top: parseInt(nodeElement.style.top, 10),
+                    left: parseInt(nodeElement.style.left, 10),
+                  }
+                : node
+            )
+          );
+        },
+      });
+      draggableNodesRef.current.add(nodeId);
+    }
   };
 
   const addNewNodes = (parentId, branchCount) => {
@@ -204,6 +204,15 @@ const DraggableWorkflow = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (jsPlumbInstanceRef.current) {
+      nodes.forEach((node) => {
+        makeNodeDraggable(node.id);
+      });
+      jsPlumbInstanceRef.current.repaintEverything();
+    }
+  }, [nodes]);
 
   useEffect(() => {
     if (jsPlumbInstanceRef.current) {

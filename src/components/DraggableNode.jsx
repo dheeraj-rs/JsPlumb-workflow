@@ -4,7 +4,7 @@ const DraggableNode = ({ node, onClick }) => {
   return (
     <div
       id={node.id}
-      onClick={onClick}
+      // onClick={onClick}
       style={{
         position: 'absolute',
         top: `${node.top}px`,

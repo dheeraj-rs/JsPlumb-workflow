@@ -1,23 +1,11 @@
-import logo from './logo.svg';
-import './App.css';
+import 'jsplumb/css/jsplumbtoolkit-defaults.css';
+import DraggableWorkflow from './components/DraggableWorkflow';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ height: '100%', overflowY: 'scroll', padding: '5px' }}>
+      <h1>jsPlumb Example</h1>
+      <DraggableWorkflow />
     </div>
   );
 }
